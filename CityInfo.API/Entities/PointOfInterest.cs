@@ -13,6 +13,9 @@ namespace CityInfo.API.Entities
         [MaxLength(50)]
         public string Name { get; set; }
 
+        [MaxLength(200)]
+        public string? Description { get; set; }
+
         //since pointofinterest is part of city, adding city property sets up a relation between the two that some dbs can map and use for navigation, we set cityid as the foreign key that it is
         [ForeignKey("CityId")]
         public City? City { get; set; }

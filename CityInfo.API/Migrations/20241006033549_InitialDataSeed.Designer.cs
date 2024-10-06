@@ -2,6 +2,7 @@
 using CityInfo.API.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityInfo.API.Migrations
 {
     [DbContext(typeof(CityInfoContext))]
-    partial class CityInfoContextModelSnapshot : ModelSnapshot
+    [Migration("20241006033549_InitialDataSeed")]
+    partial class InitialDataSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -53,12 +56,6 @@ namespace CityInfo.API.Migrations
                             Id = 3,
                             Description = "City with Eiffel tower",
                             Name = "Paris"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "North city",
-                            Name = "Hargeisa"
                         });
                 });
 
@@ -85,78 +82,6 @@ namespace CityInfo.API.Migrations
                     b.HasIndex("CityId");
 
                     b.ToTable("PointOfInterests");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CityId = 1,
-                            Description = "Food Joint",
-                            Name = "Hazzerdous"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CityId = 1,
-                            Description = "Game Park",
-                            Name = "Jumanji"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CityId = 1,
-                            Description = "A prayer mosque",
-                            Name = "Mosque of NY"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CityId = 2,
-                            Description = "Beach resort",
-                            Name = "Xeebta Liido"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CityId = 2,
-                            Description = "A prayer mosque",
-                            Name = "Masaajidka Xamar"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CityId = 3,
-                            Description = "Dessert parlor",
-                            Name = "Benzema browns"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CityId = 3,
-                            Description = "Footie Spot",
-                            Name = "Iniesta"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CityId = 3,
-                            Description = "A prayer mosque",
-                            Name = "Mosque of Paris"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CityId = 4,
-                            Description = "Social area for elders",
-                            Name = "Haraar House"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CityId = 4,
-                            Description = "A prayer mosque",
-                            Name = "Masaajidka Hargeisa"
-                        });
                 });
 
             modelBuilder.Entity("CityInfo.API.Entities.PointOfInterest", b =>
