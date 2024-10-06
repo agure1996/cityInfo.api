@@ -1,7 +1,26 @@
+using CityInfo.API;
+using CityInfo.API.DBContext;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
+
+//serilog logger created 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/cityinfo.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+//commented out due to using serilog instead
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
+builder.Host.UseSerilog();
+
+// add logger
+
 
 // Add services to the container.
 
@@ -15,15 +34,20 @@ builder.Services.AddControllers(options =>
     .AddXmlDataContractSerializerFormatters(); //Added xml format to our responses by calling this one method
 
 
+
 //Testing Problem details
-builder.Services.AddProblemDetails(options =>
-{
-    options.CustomizeProblemDetails = ctx =>
-    {
-        ctx.ProblemDetails.Extensions.Add("additionalInfo", "Testing additional info with bad request");
-        ctx.ProblemDetails.Extensions.Add("server", Environment.MachineName);
-    };
-});
+builder.Services.AddProblemDetails();
+
+
+
+//builder.Services.AddProblemDetails(options =>
+//{
+//    options.CustomizeProblemDetails = ctx =>
+//    {
+//        ctx.ProblemDetails.Extensions.Add("additionalInfo", "Testing additional info with bad request");
+//        ctx.ProblemDetails.Extensions.Add("server", Environment.MachineName);
+//    };
+//});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -31,9 +55,24 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>(); // allows us to inject fileextensiontypecontent provider to provide support for files with different content types e.g. application/pdf
 
+#if DEBUG
+//adding local mail service (interface, implementation class), IoC Principle, trying to decouple implementations from services 
+builder.Services.AddTransient<IMailService,LocalMailService>();
+#elif RELEASE //we use the cloud mail service
+builder.Services.AddTransient<IMailService,CloudMailService>();
+#endif
+//adding datastore as a singleton
+builder.Services.AddSingleton<CitiesDataStore>();
+
+//adding my DbContext
+builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlite("Data Source=CityInfo.db"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+//check for if the application is not in development mode
+if (!app.Environment.IsDevelopment())app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

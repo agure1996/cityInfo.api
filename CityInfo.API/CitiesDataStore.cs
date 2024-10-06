@@ -7,7 +7,8 @@ namespace CityInfo.API
 
         public List<CityDTO> Cities { get; set; }
 
-        public static CitiesDataStore Current { get; } = new CitiesDataStore();
+        //since cities data store is technically a singleton  we will use singleton service in program to call the datastore
+        //public static CitiesDataStore Current { get; } = new CitiesDataStore();
 
         public CitiesDataStore()
         {
