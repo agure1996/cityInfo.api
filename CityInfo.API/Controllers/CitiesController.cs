@@ -14,6 +14,7 @@ namespace CityInfo.API.Controllers
 
         private readonly ICityInfoRepository _cityInfoRepository;
         private readonly IMapper _mapper;
+        const int MAXCITIESPERPAGE = 20;
 
         public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
         {
@@ -21,11 +22,34 @@ namespace CityInfo.API.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /**
+                 * originally we looped through list 
+                 * but now we simply get the contents via async function
+                 * then proceed to then use automapper to map city entity in db to the dto object
+                        foreach (var city in CitiesJson)
+                        {
+                            results.Add(new CityWithoutPOIDTO
+                            {
+                                Id = city.Id,
+                                Description = city.Description,
+                                Name = city.Name
+                            });
+                        }
+                    return Ok(results);
+              * 
+              */
         [HttpGet]
-        public async Task <ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities()
+        public async Task<ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities(
+            string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
+            if (pageSize > MAXCITIESPERPAGE) {
+                pageNumber = MAXCITIESPERPAGE; 
+            }
+            var (cityEntities, paginationMetadata) = await _cityInfoRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
+            
+            Response.Headers.Add("X-Pagination",
+                System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
-            var cityEntities = await _cityInfoRepository.GetCitiesAsync();
             return Ok(_mapper.Map<IEnumerable<CityWithoutPOIDTO>>(cityEntities));
             /**
              * originally we looped through list 
@@ -44,6 +68,8 @@ namespace CityInfo.API.Controllers
              * 
              */
         }
+
+
         //public JsonResult GetCities()
         //{
         //    var CitiesJson = CitiesDataStore.Current.Cities;
@@ -53,9 +79,9 @@ namespace CityInfo.API.Controllers
 
 
         [HttpGet("{CityId}")]
-        public async Task<IActionResult> GetCityById(int CityId , bool includePOI = false)
+        public async Task<IActionResult> GetCityById(int CityId, bool includePOI = false)
         {
-            var city = await _cityInfoRepository.GetCityASync(CityId,includePOI);
+            var city = await _cityInfoRepository.GetCityASync(CityId, includePOI);
 
             if (city == null) return NotFound();
 
@@ -65,16 +91,6 @@ namespace CityInfo.API.Controllers
             }
             return Ok(_mapper.Map<CityWithoutPOIDTO>(city));
         }
-
-
-
-
-
-        //public JsonResult GetCityById(int id)
-        //{
-        //    return new JsonResult(
-        //        CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == id));
-        //}
 
     }
 }

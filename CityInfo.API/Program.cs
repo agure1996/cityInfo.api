@@ -63,7 +63,7 @@ builder.Services.AddTransient<IMailService,LocalMailService>();
 builder.Services.AddTransient<IMailService,CloudMailService>();
 #endif
 //adding datastore as a singleton
-builder.Services.AddSingleton<CityInfo.API.ICityInfoRepository>();
+//builder.Services.AddSingleton<CityInfo.API.ICityInfoRepository>();
 
 //adding my DbContext
 builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]));
