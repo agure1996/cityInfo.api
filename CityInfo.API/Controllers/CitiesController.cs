@@ -1,4 +1,6 @@
-﻿using CityInfo.API.Models;
+﻿using AutoMapper;
+using CityInfo.API.Models;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
@@ -7,37 +9,67 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class CitiesController : ControllerBase
     {
-        private readonly CitiesDataStore _citiesDataStore;
+        //replace datastore with repository
+        //private readonly CitiesDataStore _citiesDataStore;
 
-        public CitiesController(CitiesDataStore citiesDataStore)
+        private readonly ICityInfoRepository _cityInfoRepository;
+        private readonly IMapper _mapper;
+
+        public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
         {
-            _citiesDataStore = citiesDataStore ?? throw new ArgumentNullException(nameof(citiesDataStore));
+            _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CityDTO>> GetCities()
+        public async Task <ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities()
         {
-            var CitiesJson = _citiesDataStore.Cities;
-           
-            return Ok(CitiesJson);
+
+            var cityEntities = await _cityInfoRepository.GetCitiesAsync();
+            return Ok(_mapper.Map<IEnumerable<CityWithoutPOIDTO>>(cityEntities));
+            /**
+             * originally we looped through list 
+             * but now we simply get the contents via async function
+             * then proceed to then use automapper to map city entity in db to the dto object
+                    foreach (var city in CitiesJson)
+                    {
+                        results.Add(new CityWithoutPOIDTO
+                        {
+                            Id = city.Id,
+                            Description = city.Description,
+                            Name = city.Name
+                        });
+                    }
+                return Ok(results);
+             * 
+             */
         }
         //public JsonResult GetCities()
         //{
         //    var CitiesJson = CitiesDataStore.Current.Cities;
-           
+
         //    return new JsonResult(CitiesJson);
         //}
 
 
         [HttpGet("{CityId}")]
-        public ActionResult<CityDTO> GetCityById(int CityId)
+        public async Task<IActionResult> GetCityById(int CityId , bool includePOI = false)
         {
-           var CityToReturn = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == CityId);
+            var city = await _cityInfoRepository.GetCityASync(CityId,includePOI);
 
-            if(CityToReturn == null) return NotFound();
+            if (city == null) return NotFound();
 
-            return Ok(CityToReturn);
+            if (includePOI)
+            {
+                return Ok(_mapper.Map<CityDTO>(city));
+            }
+            return Ok(_mapper.Map<CityWithoutPOIDTO>(city));
         }
+
+
+
+
+
         //public JsonResult GetCityById(int id)
         //{
         //    return new JsonResult(

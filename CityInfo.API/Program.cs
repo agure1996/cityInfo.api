@@ -4,6 +4,7 @@ using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using AutoMapper;
 
 
 //serilog logger created 
@@ -62,10 +63,16 @@ builder.Services.AddTransient<IMailService,LocalMailService>();
 builder.Services.AddTransient<IMailService,CloudMailService>();
 #endif
 //adding datastore as a singleton
-builder.Services.AddSingleton<CitiesDataStore>();
+builder.Services.AddSingleton<CityInfo.API.ICityInfoRepository>();
 
 //adding my DbContext
-builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlite("Data Source=CityInfo.db"));
+builder.Services.AddDbContext<CityInfoContext>(dbContextOptions => dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]));
+
+//Creating scoped datastore
+builder.Services.AddScoped<CityInfo.API.Services.ICityInfoRepository, CityInfoRepository>();
+
+//using Automapper to map from city object variables with dto
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
