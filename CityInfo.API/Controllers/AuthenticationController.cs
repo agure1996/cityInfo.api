@@ -70,7 +70,7 @@ namespace CityInfo.API.Controllers
              * Current dont have a database so return current data
              */
 
-            return new CityInfoUser(1, username ?? "", "Abbas", "Gure", "Spijkenisse");
+            return new CityInfoUser(1, username ?? "", "Abbas", "Gure", "Xamar City");
         }
         private class CityInfoUser
         {

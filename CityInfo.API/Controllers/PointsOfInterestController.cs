@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityInfo.API.Entities;
 using CityInfo.API.Models;
 using CityInfo.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace CityInfo.API.Controllers
 {
     [Route("api/cities/{cityId}/pointsofinterest")]
-    [Authorize] //after setting authorisation middleware set this controller to check authorisation
+    [Authorize(Policy = "MustBeFromSpij")] /*after setting authorisation middleware set this controller to check authorisation
+                                            * Just to test added policy, refer to program */
     [ApiController]
     public class PointsOfInterestController : ControllerBase
     {
@@ -37,7 +39,12 @@ namespace CityInfo.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PointsOfInterestDTO>>> GetPointsOfInterest(int cityId)
         {
+            var cityNameClaim = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
 
+            if (!await _cityInfoRepository.CityNameMatchesCityClaim(cityNameClaim, cityId))
+            {
+                return Forbid();
+            }
             if (!await _cityInfoRepository.CityExistsAsync(cityId))
             {
                 _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest.");

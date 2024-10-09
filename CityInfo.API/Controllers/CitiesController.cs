@@ -44,6 +44,8 @@ namespace CityInfo.API.Controllers
         public async Task<ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities(
             string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
+            
+
             if (pageSize > MAXCITIESPERPAGE) {
                 pageNumber = MAXCITIESPERPAGE; 
             }
@@ -83,6 +85,8 @@ namespace CityInfo.API.Controllers
         [HttpGet("{CityId}")]
         public async Task<IActionResult> GetCityById(int CityId, bool includePOI = false)
         {
+            
+
             var city = await _cityInfoRepository.GetCityASync(CityId, includePOI);
 
             if (city == null) return NotFound();

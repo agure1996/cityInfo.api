@@ -81,6 +81,13 @@ public class CityInfoRepository : ICityInfoRepository
         var city = await GetCityASync(cityId, false);
         if (city != null) { city.PointsOfInterest.Add(pointOfInterest); }
     }
+    public async Task<bool> CityNameMatchesCityClaim(string? cityName, int cityId)
+    {
+    
+        return await _context.Cities.AnyAsync(c=>c.Id == cityId && c.Name == cityName);
+    
+    }
+
 
     public async Task<bool> SaveChangesASync()
     {

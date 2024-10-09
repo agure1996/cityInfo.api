@@ -90,6 +90,23 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
     };
 });
 
+/* There are different Access control systems such as [MAC] Mandatory access control, Policy based access control [PBAC] 
+ * Lets try dotnets PBAC 
+ * Adding policy
+ */
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeFromSpij", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("city", "Xamar City");
+    });
+});
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
