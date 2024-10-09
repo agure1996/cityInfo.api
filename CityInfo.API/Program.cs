@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 
 
 //serilog logger created 
@@ -74,6 +75,21 @@ builder.Services.AddScoped<CityInfo.API.Services.ICityInfoRepository, CityInfoRe
 //using Automapper to map from city object variables with dto
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//jwt token bearer
+builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+        ValidAudience = builder.Configuration["Authentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Authentication:SecretForeignKey"]))
+
+    };
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -86,9 +102,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+//use middlewares
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseAuthentication(); //use authentication
 
 app.UseAuthorization();
 

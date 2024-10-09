@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using CityInfo.API.Models;
 using CityInfo.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
 {
     [ApiController]
+    [Authorize] //after setting authorisation middleware set this controller to check authorisation
     [Route("api/cities")]
     public class CitiesController : ControllerBase
     {
