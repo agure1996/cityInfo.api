@@ -216,7 +216,7 @@ namespace CityInfo.API.Controllers
             await _cityInfoRepository.SaveChangesASync(); // Save changes
 
             string message = $"Point of interest {pointOfInterestEntity.Name} (ID: {pointOfInterestEntity.Id}) has been deleted."; // Log message
-            _mailService.send("Point of interest deleted.", message); // Send notification
+            _mailService.Send("Point of interest deleted.", message); // Send notification
 
             return NoContent(); // Return NoContent on success
         }
