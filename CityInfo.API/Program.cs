@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.OpenApi.Models;
 
 // Serilog logger configuration for logging
 Log.Logger = new LoggerConfiguration()
@@ -94,7 +95,8 @@ builder.Services.AddApiVersioning(setupAction =>
 });
 
 // Swagger documentation setup
-var apiVersionDescriptionProvider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+var apiVersionDescriptionProvider = builder.Services.BuildServiceProvider()
+    .GetRequiredService<IApiVersionDescriptionProvider>();
 
 builder.Services.AddSwaggerGen(setupAction =>
 {
@@ -115,6 +117,34 @@ builder.Services.AddSwaggerGen(setupAction =>
     var xmlCommentsFile = $"{cityApi}.xml";
     var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
     setupAction.IncludeXmlComments(xmlCommentsFullPath);
+
+    //Adding authentication support via SecurityDefinition
+
+    setupAction.AddSecurityDefinition("CityInfoApiBearerAuth", new()
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Input a valid token to use this Api"
+    });
+
+    ///Since the bearer token is not automatically sent in authorization header when api calls are made.
+    ///To make sure it is we mark on the requests that they require authentication before use.
+    ///so people understand if their request is not accepted because of lack of token
+
+    setupAction.AddSecurityRequirement(new()
+    {
+        {
+            new()
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "CityInfoApiBearerAuth" }
+            },
+                new List<string>()
+        }
+    });
+
 });
 
 var app = builder.Build(); // Build the application
