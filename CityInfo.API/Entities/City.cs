@@ -40,7 +40,7 @@ namespace CityInfo.API.Entities
         /// <summary>
         /// Points of Interests in the form of List Collection
         /// </summary>
-        public ICollection<PointOfInterest> PointsOfInterest { get; set; }
+        public virtual ICollection<PointOfInterest> PointsOfInterest { get; set; }
         = new List<PointOfInterest>();
 
         /// <summary>
@@ -48,5 +48,18 @@ namespace CityInfo.API.Entities
         /// </summary>
         /// <param name="name">Name of City</param>
         public City(string name) {  Name = name; }
+
+
+        /// <summary>
+        /// Overloaded constructor for City class that includes description.
+        /// </summary>
+        /// <param name="name">Name of City</param>
+        /// <param name="description">Description of City</param>
+        public City(string name, string? description = null)
+        {
+            Name = name;
+            Description = description;
+        }
+
     }
 }
