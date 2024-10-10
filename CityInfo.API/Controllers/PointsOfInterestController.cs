@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using CityInfo.API.Entities;
 using CityInfo.API.Models;
 using CityInfo.API.Services;
@@ -8,8 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
 {
-    [Route("api/cities/{cityId}/pointsofinterest")]
-    [Authorize(Policy = "MustBeFromSpij")] /*after setting authorisation middleware set this controller to check authorisation
+    [Route("api/v{version:apiVersion}/cities/{cityId}/pointsofinterest")]
+    [ApiVersion(1)]
+    /*
+    [Authorize(Policy = "MustBeFromSpij")] after setting authorisation middleware set this controller to check authorisation
                                             * Just to test added policy, refer to program */
     [ApiController]
     public class PointsOfInterestController : ControllerBase
@@ -22,7 +25,14 @@ namespace CityInfo.API.Controllers
         private readonly ICityInfoRepository _cityInfoRepository;
         private readonly IMapper _mapper;
 
-
+        /// <summary>
+        /// Controller for Points of interest object
+        /// </summary>
+        /// <param name="logger">Logger for logging API requests</param>
+        /// <param name="mailService">Service for sending mail</param>
+        /// <param name="cityInfoRepository">City repository</param>
+        /// <param name="mapper">Mapper mapping entity to City or Point of interest DTO's</param>
+        /// <exception cref="ArgumentNullException">If arguments dont exist or are null</exception>
         public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailService, ICityInfoRepository cityInfoRepository, IMapper mapper)
         {
             _logger = logger ??
@@ -35,7 +45,11 @@ namespace CityInfo.API.Controllers
                 throw new ArgumentNullException(nameof(mapper));
         }
 
-
+        /// <summary>
+        /// Get point of interest of a city
+        /// </summary>
+        /// <param name="cityId">Id of city whose point of interest we are looking at</param>
+        /// <returns>list all points of interest of the city, mapped in appropriate dto format</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PointsOfInterestDTO>>> GetPointsOfInterest(int cityId)
         {
@@ -54,6 +68,13 @@ namespace CityInfo.API.Controllers
             return Ok(_mapper.Map<IEnumerable<PointsOfInterestDTO>>(pointsOfInterestForSelectedCity));
         }
 
+        /// <summary>
+        /// Get a single point of interest of a city using the city and the point of interest Id
+        /// </summary>
+        /// <param name="cityId">Id of city</param>
+        /// <param name="PointOfInterestId">Id of point of interest</param>
+        /// <returns>Point of interest if it exists</returns>
+
         [HttpGet("{PointOfInterestId}", Name = "GetPointOfInterest")]
         public async Task<ActionResult<PointsOfInterestDTO>> GetPointOfInterest(int cityId, int PointOfInterestId)
         {
@@ -68,7 +89,12 @@ namespace CityInfo.API.Controllers
             return Ok(_mapper.Map<PointsOfInterestDTO>(poi));
         }
 
-
+        /// <summary>
+        /// Create a point of interest for a city
+        /// </summary>
+        /// <param name="CityId">Id of city</param>
+        /// <param name="pointOfInterest">Point of interest object</param>
+        /// <returns>Point of interest created</returns>
         [HttpPost]
         public async Task<ActionResult<PointsOfInterestDTO>> CreatePointOfInterest(int CityId, [FromBody] CreatePointOfInterestDTO pointOfInterest)
         {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
-
+using System.Reflection;
 
 //serilog logger created 
 Log.Logger = new LoggerConfiguration()
@@ -54,7 +54,14 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setupAction =>
+{
+    var cityApi = $"{Assembly.GetExecutingAssembly().GetName().Name}";
+    var xmlCommentsFile = $"{cityApi}.xml";
+    var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+    setupAction.IncludeXmlComments(xmlCommentsFullPath);
+});
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>(); // allows us to inject fileextensiontypecontent provider to provide support for files with different content types e.g. application/pdf
 
 #if DEBUG
@@ -105,6 +112,16 @@ builder.Services.AddAuthorization(options =>
 });
 
 
+/**
+ * Setting up versioning
+ */
+
+builder.Services.AddApiVersioning(setupAction =>
+{
+    setupAction.ReportApiVersions = true;
+    setupAction.AssumeDefaultVersionWhenUnspecified = true;
+    setupAction.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+}).AddMvc();
 
 
 var app = builder.Build();

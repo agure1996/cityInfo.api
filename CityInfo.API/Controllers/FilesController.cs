@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace CityInfo.API.Controllers
 {
-    [Route("api/files")]
+    [Route("api/v{version:apiVersion}/files")]
+    [ApiVersion("1.0")]
     [Authorize] //after setting authorisation middleware set this controller to check authorisation
     [ApiController]
     public class FilesController : ControllerBase
@@ -19,6 +21,7 @@ namespace CityInfo.API.Controllers
                 ?? throw new System.ArgumentNullException(nameof(fileExtensionContentTypeProvider));
         }
         [HttpGet("{FileId}")]
+        [ApiVersion(0.1,Deprecated =true)]
         public ActionResult GetFile(string FileId)
         {
             //Look up the actual file, depending on fileId...

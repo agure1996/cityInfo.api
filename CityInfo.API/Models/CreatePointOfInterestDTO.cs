@@ -2,15 +2,23 @@
 
 namespace CityInfo.API.Models
 {
-
+    /// <summary>
+    /// DTO for creating point of interest
+    /// </summary>
     public class CreatePointOfInterestDTO 
     {   
+        /// Annotation for data is required
 
-        //Annotation for data is required
+        /// <summary>
+        /// Name of point of interest
+        /// </summary>
         [Required(ErrorMessage = "Provide a name please.")]
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Description of point of interest
+        /// </summary>
         [MaxLength(200)]
         public string? Description { get; set; }
     }

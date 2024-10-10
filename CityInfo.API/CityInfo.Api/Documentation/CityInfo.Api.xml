@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CityInfo.API</name>
+    </assembly>
+    <members>
+        <member name="T:CityInfo.API.Controllers.AuthenticationController.AuthenticationRequestBody">
+            We wont use this outside this class so we can scope it to this namespace
+        </member>
+        <member name="M:CityInfo.API.Controllers.CitiesController.GetCities(System.String,System.String,System.Int32,System.Int32)">
+                             * originally we looped through list 
+                             * but now we simply get the contents via async function
+                             * then proceed to then use automapper to map city entity in db to the dto object
+                                    foreach (var city in CitiesJson)
+                                    {
+                                        results.Add(new CityWithoutPOIDTO
+                                        {
+                                            Id = city.Id,
+                                            Description = city.Description,
+                                            Name = city.Name
+                                        });
+                                    }
+                                return Ok(results);
+                          * 
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <param name="searchQuery"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:CityInfo.API.Controllers.CitiesController.GetCityById(System.Int32,System.Boolean)">
+            <summary>
+            Get a city by id
+            </summary>
+            <param name="CityId"> Id of the City</param>
+            <param name="includePOI">Whether or not to include points of interest</param>
+            <returns>Return a city with or without points of interests</returns>
+        </member>
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.#ctor(Microsoft.Extensions.Logging.ILogger{CityInfo.API.Controllers.PointsOfInterestController},CityInfo.API.Services.IMailService,CityInfo.API.Services.ICityInfoRepository,AutoMapper.IMapper)">
+            <summary>
+            Controller for Points of interest object
+            </summary>
+            <param name="logger">Logger for logging API requests</param>
+            <param name="mailService">Service for sending mail</param>
+            <param name="cityInfoRepository">City repository</param>
+            <param name="mapper">Mapper mapping entity to City or Point of interest DTO's</param>
+            <exception cref="T:System.ArgumentNullException">If arguments dont exist or are null</exception>
+        </member>
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointsOfInterest(System.Int32)">
+            <summary>
+            Get point of interest of a city
+            </summary>
+            <param name="cityId">Id of city whose point of interest we are looking at</param>
+            <returns>list all points of interest of the city, mapped in appropriate dto format</returns>
+        </member>
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.GetPointOfInterest(System.Int32,System.Int32)">
+            <summary>
+            Get a single point of interest of a city using the city and the point of interest Id
+            </summary>
+            <param name="cityId">Id of city</param>
+            <param name="PointOfInterestId">Id of point of interest</param>
+            <returns>Point of interest if it exists</returns>
+        </member>
+        <member name="M:CityInfo.API.Controllers.PointsOfInterestController.CreatePointOfInterest(System.Int32,CityInfo.API.Models.CreatePointOfInterestDTO)">
+            <summary>
+            Create a point of interest for a city
+            </summary>
+            <param name="CityId">Id of city</param>
+            <param name="pointOfInterest">Point of interest object</param>
+            <returns>Point of interest created</returns>
+        </member>
+        <member name="P:CityInfo.API.Entities.City.Id">
+            You will notice in our DTO we dont add requirements
+            And that is because DTOs are only used to get data, not manipulate it to no need for regulations
+        </member>
+        <member name="T:CityInfo.API.Migrations.CityInfoDBInitialMigration">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBInitialMigration.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBInitialMigration.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBInitialMigration.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CityInfo.API.Migrations.CityInfoDBAddPOIDescription">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBAddPOIDescription.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBAddPOIDescription.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.CityInfoDBAddPOIDescription.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CityInfo.API.Migrations.InitialDataSeed">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeed.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeed.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeed.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CityInfo.API.Migrations.InitialDataSeedComplete">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeedComplete.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeedComplete.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CityInfo.API.Migrations.InitialDataSeedComplete.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CityInfo.API.Models.CityDTO">
+            <summary>
+            DTO of City Object
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CityDTO.Id">
+            <summary>
+            Id of City
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CityDTO.Name">
+            <summary>
+            Name of City, by default is empty
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CityDTO.Description">
+            <summary>
+            Description of city
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CityDTO.NumberOfPointsOfInterest">
+            <summary>
+            Number of points of interest
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CityDTO.PointsOfInterest">
+            <summary>
+            Collection of points of interest
+            </summary>
+        </member>
+        <member name="T:CityInfo.API.Models.CreatePointOfInterestDTO">
+            <summary>
+            DTO for creating point of interest
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CreatePointOfInterestDTO.Name">
+            Annotation for data is required
+            <summary>
+            Name of point of interest
+            </summary>
+        </member>
+        <member name="P:CityInfo.API.Models.CreatePointOfInterestDTO.Description">
+            <summary>
+            Description of point of interest
+            </summary>
+        </member>
+    </members>
+</doc>
