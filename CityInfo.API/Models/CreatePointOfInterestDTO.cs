@@ -3,7 +3,7 @@
 namespace CityInfo.API.Models
 {
     /// <summary>
-    /// DTO for creating point of interest
+    /// DTO for function for creating a point of interest
     /// </summary>
     public class CreatePointOfInterestDTO 
     {   
