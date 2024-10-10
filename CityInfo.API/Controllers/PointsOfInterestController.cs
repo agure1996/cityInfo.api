@@ -44,7 +44,13 @@ namespace CityInfo.API.Controllers
         /// </summary>
         /// <param name="cityId">The ID of the city for which the points of interest are being retrieved.</param>
         /// <returns>A list of points of interest for the specified city.</returns>
+        /// <response code="200">Returns a list of Points of Interest.</response>
+        /// <response code="403">Returns Forbidden if the city name does not match the user's claim.</response>
+        /// <response code="404">Returns NotFound if the city does not exist.</response>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<PointsOfInterestDTO>>> GetPointsOfInterest(int cityId)
         {
             var cityNameClaim = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
@@ -73,7 +79,11 @@ namespace CityInfo.API.Controllers
         /// <param name="cityId">The ID of the city that contains the point of interest.</param>
         /// <param name="PointOfInterestId">The ID of the point of interest to retrieve.</param>
         /// <returns>The requested point of interest, or a NotFound result if it doesn't exist.</returns>
+        /// <response code="200">Returns the requested point of interest.</response>
+        /// <response code="404">Returns NotFound if the city or point of interest does not exist.</response>
         [HttpGet("{PointOfInterestId}", Name = "GetPointOfInterest")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PointsOfInterestDTO>> GetPointOfInterest(int cityId, int PointOfInterestId)
         {
             // Check if the city exists
@@ -98,7 +108,11 @@ namespace CityInfo.API.Controllers
         /// <param name="CityId">The ID of the city where the point of interest will be created.</param>
         /// <param name="pointOfInterest">The point of interest data to create.</param>
         /// <returns>The created point of interest.</returns>
+        /// <response code="201">Returns the created point of interest.</response>
+        /// <response code="404">Returns NotFound if the city does not exist.</response>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PointsOfInterestDTO>> CreatePointOfInterest(int CityId, [FromBody] CreatePointOfInterestDTO pointOfInterest)
         {
             // Check if the city exists
@@ -126,7 +140,11 @@ namespace CityInfo.API.Controllers
         /// <param name="PointOfInterestId">The ID of the point of interest to update.</param>
         /// <param name="pointOfInterestBeingUpdated">The updated point of interest data.</param>
         /// <returns>No content if successful, or NotFound if the city or point of interest doesn't exist.</returns>
+        /// <response code="204">Returns NoContent if the update is successful.</response>
+        /// <response code="404">Returns NotFound if the city or point of interest does not exist.</response>
         [HttpPut("{PointOfInterestId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdatePointOfInterest(int CityId, int PointOfInterestId, UpdatePointOfInterestDTO pointOfInterestBeingUpdated)
         {
             // Check if the city exists
@@ -156,7 +174,13 @@ namespace CityInfo.API.Controllers
         /// <param name="PointOfInterestId">The ID of the point of interest to update.</param>
         /// <param name="patchDocument">The patch document containing the updates.</param>
         /// <returns>No content if successful, or BadRequest if validation fails.</returns>
+        /// <response code="204">Returns NoContent if the update is successful.</response>
+        /// <response code="400">Returns BadRequest if the patch document is invalid.</response>
+        /// <response code="404">Returns NotFound if the city or point of interest does not exist.</response>
         [HttpPatch("{PointOfInterestId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PartiallyUpdatePointOfInterest(int CityId, int PointOfInterestId, JsonPatchDocument<UpdatePointOfInterestDTO> patchDocument)
         {
             // Check if the city exists
@@ -195,7 +219,11 @@ namespace CityInfo.API.Controllers
         /// <param name="CityId">The ID of the city containing the point of interest.</param>
         /// <param name="PointOfInterestId">The ID of the point of interest to delete.</param>
         /// <returns>No content if the deletion is successful, or NotFound if the city or point of interest doesn't exist.</returns>
+        /// <response code="204">Returns NoContent if the deletion is successful.</response>
+        /// <response code="404">Returns NotFound if the city or point of interest does not exist.</response>
         [HttpDelete("{PointOfInterestId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeletePointOfInterest(int CityId, int PointOfInterestId)
         {
             // Check if the city exists

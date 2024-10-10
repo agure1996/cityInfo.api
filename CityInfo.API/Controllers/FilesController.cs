@@ -33,12 +33,16 @@ namespace CityInfo.API.Controllers
         /// <summary>
         /// Retrieves a file based on its ID.
         /// </summary>
+        /// <response code="200">Returns the requested file if it exists.</response>
+        /// <response code="404">Returns NotFound if the file does not exist.</response>
         /// <param name="FileId">The ID of the file to retrieve.</param>
         /// <returns>
         /// The requested file as a byte array, or a NotFound result if the file does not exist.
         /// </returns>
         [HttpGet("{FileId}")]
         [ApiVersion(0.1, Deprecated = true)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult GetFile(string FileId)
         {
             // Look up the actual file, depending on FileId...
@@ -68,6 +72,8 @@ namespace CityInfo.API.Controllers
         /// <summary>
         /// Creates a new file from the uploaded file.
         /// </summary>
+        /// <response code="200">Returns success message if the file is uploaded successfully.</response>
+        /// <response code="400">Returns BadRequest if the file is invalid.</response>
         /// <param name="file">The file to be uploaded.</param>
         /// <returns>
         /// An ActionResult indicating the success or failure of the upload operation.
@@ -75,6 +81,8 @@ namespace CityInfo.API.Controllers
         /// or a BadRequest response if the file is invalid.
         /// </returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateFile(IFormFile file)
         {
             // Validate the input file

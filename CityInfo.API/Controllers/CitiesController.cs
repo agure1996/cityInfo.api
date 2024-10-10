@@ -40,8 +40,14 @@ namespace CityInfo.API.Controllers
         /// <param name="searchQuery">Optional search query to filter cities by a keyword in the name or description.</param>
         /// <param name="pageNumber">Page number for pagination (default is 1).</param>
         /// <param name="pageSize">Number of cities per page (default is 10, max is 20).</param>
+        /// <response code="200">Returns a paginated list of cities.</response>
+        /// <response code="400">Invalid parameters provided.</response>
+        /// <response code="404">No cities found.</response>
         /// <returns>A paginated list of cities in the form of CityWithoutPOIDTO.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CityWithoutPOIDTO>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities(
             string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
@@ -65,10 +71,16 @@ namespace CityInfo.API.Controllers
         /// <summary>
         /// Retrieves a specific city by its ID, with an option to include its Points of Interest (POIs).
         /// </summary>
+        /// <response code="200">Returns the requested city information.</response>
+        /// <response code="400">Invalid city ID provided.</response>
+        /// <response code="404">City not found.</response>
         /// <param name="CityId">ID of the city to retrieve.</param>
         /// <param name="includePOI">Boolean flag to include or exclude POIs. If true, POIs are included.</param>
         /// <returns>Returns the city information, either with or without POIs, depending on the flag.</returns>
         [HttpGet("{CityId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CityDTO))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCityById(int CityId, bool includePOI = false)
         {
             // Retrieve the city from the repository, optionally including its POIs.

@@ -35,9 +35,13 @@ namespace CityInfo.API.Controllers
         /// <summary>
         /// Authenticates a user and generates a JWT token.
         /// </summary>
+        /// <response code="200">Returns a JWT token if authentication is successful.</response>
+        /// <response code="401">Returns Unauthorized if authentication fails.</response>
         /// <param name="authenticationRequestBody">The request body containing user credentials.</param>
         /// <returns>A JWT token if authentication is successful, or Unauthorized if it fails.</returns>
         [HttpPost("authenticate")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<string> Authenticate([FromBody] AuthenticationRequestBody authenticationRequestBody)
         {
             // Step 1: Validate username and password
