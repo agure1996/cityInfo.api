@@ -7,110 +7,88 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
 {
+    /// <summary>
+    /// Controller for handling City-related operations, providing API access to retrieve cities with or without Points of Interest (POIs).
+    /// Supports API versioning and uses a repository pattern to fetch data.
+    /// </summary>
     [ApiController]
-    /*[Authorize]*/ //after setting authorisation middleware set this controller to check authorisation
+    //[Authorize] // Enable after setting up authorization middleware
     [Route("api/v{version:apiVersion}/cities")]
     [ApiVersion("1.0")]
     public class CitiesController : ControllerBase
     {
-        //replace datastore with repository
-        //private readonly CitiesDataStore _citiesDataStore;
-
         private readonly ICityInfoRepository _cityInfoRepository;
         private readonly IMapper _mapper;
-        const int MAXCITIESPERPAGE = 20;
+        private const int MAXCITIESPERPAGE = 20;
 
+        /// <summary>
+        /// Constructor for CitiesController.
+        /// </summary>
+        /// <param name="cityInfoRepository">Repository for city-related database operations.</param>
+        /// <param name="mapper">AutoMapper instance to map entities to DTOs.</param>
+        /// <exception cref="ArgumentNullException">Thrown when cityInfoRepository or mapper is null.</exception>
         public CitiesController(ICityInfoRepository cityInfoRepository, IMapper mapper)
         {
             _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-
-        /**
-                 * originally we looped through list 
-                 * but now we simply get the contents via async function
-                 * then proceed to then use automapper to map city entity in db to the dto object
-                        foreach (var city in CitiesJson)
-                        {
-                            results.Add(new CityWithoutPOIDTO
-                            {
-                                Id = city.Id,
-                                Description = city.Description,
-                                Name = city.Name
-                            });
-                        }
-                    return Ok(results);
-              * 
-              */
-
-
-
-
         /// <summary>
-        /// 
+        /// Retrieves a paginated list of cities, optionally filtering by name or search query.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="searchQuery"></param>
-        /// <param name="pageNumber"></param>
-        /// <param name="pageSize"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="name">Optional name filter to search for cities by name.</param>
+        /// <param name="searchQuery">Optional search query to filter cities by a keyword in the name or description.</param>
+        /// <param name="pageNumber">Page number for pagination (default is 1).</param>
+        /// <param name="pageSize">Number of cities per page (default is 10, max is 20).</param>
+        /// <returns>A paginated list of cities in the form of CityWithoutPOIDTO.</returns>
         [HttpGet]
-
         public async Task<ActionResult<IEnumerable<CityWithoutPOIDTO>>> GetCities(
             string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
-
-
+            // Ensure the page size does not exceed the maximum allowed value.
             if (pageSize > MAXCITIESPERPAGE)
             {
-                pageNumber = MAXCITIESPERPAGE;
+                pageSize = MAXCITIESPERPAGE;
             }
+
+            // Get cities from the repository with optional filters and pagination.
             var (cityEntities, paginationMetadata) = await _cityInfoRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
 
+            // Add pagination metadata to the response headers.
             Response.Headers.Add("X-Pagination",
                 System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
+            // Map city entities to DTOs and return the result.
             return Ok(_mapper.Map<IEnumerable<CityWithoutPOIDTO>>(cityEntities));
-            /**
-             * originally we looped through list 
-             * but now we simply get the contents via async function
-             * then proceed to then use automapper to map city entity in db to the dto object
-                    foreach (var city in CitiesJson)
-                    {
-                        results.Add(new CityWithoutPOIDTO
-                        {
-                            Id = city.Id,
-                            Description = city.Description,
-                            Name = city.Name
-                        });
-                    }
-                return Ok(results);
-             * 
-             */
         }
 
         /// <summary>
-        /// Get a city by id
+        /// Retrieves a specific city by its ID, with an option to include its Points of Interest (POIs).
         /// </summary>
-        /// <param name="CityId"> Id of the City</param>
-        /// <param name="includePOI">Whether or not to include points of interest</param>
-        /// <returns>Return a city with or without points of interests</returns>
+        /// <param name="CityId">ID of the city to retrieve.</param>
+        /// <param name="includePOI">Boolean flag to include or exclude POIs. If true, POIs are included.</param>
+        /// <returns>Returns the city information, either with or without POIs, depending on the flag.</returns>
         [HttpGet("{CityId}")]
         public async Task<IActionResult> GetCityById(int CityId, bool includePOI = false)
         {
-
-
+            // Retrieve the city from the repository, optionally including its POIs.
             var city = await _cityInfoRepository.GetCityASync(CityId, includePOI);
 
-            if (city == null) return NotFound();
+            // Return 404 if the city is not found.
+            if (city == null)
+            {
+                return NotFound();
+            }
 
+            // Return the city with or without POIs, depending on the flag.
             if (includePOI)
             {
                 return Ok(_mapper.Map<CityDTO>(city));
             }
-            return Ok(_mapper.Map<CityWithoutPOIDTO>(city));
+            else
+            {
+                return Ok(_mapper.Map<CityWithoutPOIDTO>(city));
+            }
         }
-
     }
 }

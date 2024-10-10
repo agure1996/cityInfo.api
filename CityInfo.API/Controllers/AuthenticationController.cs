@@ -6,72 +6,89 @@ using System.Security.Claims;
 
 namespace CityInfo.API.Controllers
 {
+    /// <summary>
+    /// Handles authentication operations for users.
+    /// </summary>
     [Route("api/authentication")]
-    //wont use authentication here since this must be accesible for unauthenticated users to create authentication
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        private readonly IConfiguration _configuration; // Configuration for accessing app settings.
 
-        IConfiguration _configuration;
-        public AuthenticationController(IConfiguration configuration) => _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        /** 
-         * We wont use this outside this class so we can scope it to this namespace
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+        /// </summary>
+        /// <param name="configuration">Application configuration settings.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the configuration is null.</exception>
+        public AuthenticationController(IConfiguration configuration) =>
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
+        /// <summary>
+        /// Represents the request body for user authentication.
+        /// </summary>
         public class AuthenticationRequestBody
         {
-
-            public string? Username { get; set; }
-            public string? Password { get; set; }
-
-
+            public string? Username { get; set; } // The username of the user.
+            public string? Password { get; set; } // The password of the user.
         }
 
+        /// <summary>
+        /// Authenticates a user and generates a JWT token.
+        /// </summary>
+        /// <param name="authenticationRequestBody">The request body containing user credentials.</param>
+        /// <returns>A JWT token if authentication is successful, or Unauthorized if it fails.</returns>
         [HttpPost("authenticate")]
-        public ActionResult<string> Authenticate(AuthenticationRequestBody authenticationRequestBody)
-        {   
-            //steep 1- validate username/password
+        public ActionResult<string> Authenticate([FromBody] AuthenticationRequestBody authenticationRequestBody)
+        {
+            // Step 1: Validate username and password
             var user = ValidateUserCredentials(authenticationRequestBody.Username, authenticationRequestBody.Password);
 
-            if (user == null) { return Unauthorized(); }
+            if (user == null)
+            {
+                return Unauthorized(); // Return Unauthorized if credentials are invalid
+            }
 
-            //step 2 - create token
+            // Step 2: Create token
             var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Authentication:SecretForeignKey"]));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            //claims (google what claims are - A claim in this context is identity information related to the user
-            //following standards in the claim class we using
-            var ClaimsForToken = new List<Claim>();
-            ClaimsForToken.Add(new Claim("sub", user.UserId.ToString()));
-            ClaimsForToken.Add(new Claim("given_name", user.FirstName));
-            ClaimsForToken.Add(new Claim("family_name", user.LastName));
-            ClaimsForToken.Add(new Claim("city", user.City));
+            // Define claims for the token
+            var claimsForToken = new List<Claim>
+            {
+                new Claim("sub", user.UserId.ToString()), // Subject - user id
+                new Claim("given_name", user.FirstName), // User's first name
+                new Claim("family_name", user.LastName), // User's last name
+                new Claim("city", user.City) // User's city
+            };
 
             var jwtSecurityToken = new JwtSecurityToken(
-                _configuration["Authentication:Issuer"], //issuer of token
-                _configuration["Authentication:Audience"], //receiver eligible for token (both setup in app dev settings)
-                ClaimsForToken, //claims made in token
-                DateTime.UtcNow, //value indicating start time of token validity
-                DateTime.UtcNow.AddHours(1), //value indicating end time of token validity
-                signingCredentials); //singing credentials
+                issuer: _configuration["Authentication:Issuer"], // Issuer of the token
+                audience: _configuration["Authentication:Audience"], // Audience for the token
+                claims: claimsForToken, // Claims in the token
+                expires: DateTime.UtcNow.AddHours(1), // Expiration time of the token
+                signingCredentials: signingCredentials); // Signing credentials
 
-
-            // 3- write the token we just created
+            // Step 3: Write the token
             var tokenToReturn = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-            return Ok(tokenToReturn);
-
+            return Ok(tokenToReturn); // Return the generated token
         }
 
+        /// <summary>
+        /// Validates user credentials.
+        /// Currently returns a fixed user for demonstration purposes.
+        /// </summary>
+        /// <param name="username">The username to validate.</param>
+        /// <param name="password">The password to validate.</param>
+        /// <returns>A <see cref="CityInfoUser"/> object if credentials are valid; otherwise, null.</returns>
         private CityInfoUser ValidateUserCredentials(string? username, string? password)
         {
-
-            /*
-             * Current dont have a database so return current data
-             */
-
+            // For now, we return a fixed user; will implement actual validation later (e.g., against a database)
             return new CityInfoUser(1, username ?? "", "Abbas", "Gure", "Xamar City");
         }
+
+        /// <summary>
+        /// Represents a user in the CityInfo system.
+        /// </summary>
         private class CityInfoUser
         {
             public CityInfoUser(int userId, string userName, string firstName, string lastName, string city)
@@ -83,11 +100,11 @@ namespace CityInfo.API.Controllers
                 City = city;
             }
 
-            public int UserId { get; set; }
-            public string UserName { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string City { get; set; }
+            public int UserId { get; set; } // User's unique identifier
+            public string UserName { get; set; } // User's username
+            public string FirstName { get; set; } // User's first name
+            public string LastName { get; set; } // User's last name
+            public string City { get; set; } // User's city
         }
     }
 }
