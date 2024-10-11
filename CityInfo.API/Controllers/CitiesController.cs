@@ -12,7 +12,8 @@ namespace CityInfo.API.Controllers
     /// Supports API versioning and uses a repository pattern to fetch data.
     /// </summary>
     [ApiController]
-    [Authorize] // Enable after setting up authorization middleware
+    [Authorize]
+    // Enable after setting up authorization middleware
     [Route("api/v{version:apiVersion}/cities")]
     [ApiVersion("1.0")]
     public class CitiesController : ControllerBase
