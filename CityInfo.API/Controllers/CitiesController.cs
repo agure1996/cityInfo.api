@@ -15,7 +15,7 @@ namespace CityInfo.API.Controllers
     [Authorize]
     // Enable after setting up authorization middleware
     [Route("api/v{version:apiVersion}/cities")]
-    [ApiVersion("1.0")]
+    [ApiVersion(1)]
     public class CitiesController : ControllerBase
     {
         private readonly ICityInfoRepository _cityInfoRepository;
